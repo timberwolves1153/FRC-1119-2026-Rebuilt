@@ -86,25 +86,25 @@ public class Swerve extends SubsystemBase {
         
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getAngle(), getModulePositions());
 
-        AutoBuilder.configure(
-            this::getPose,
-            this::resetOdometry,
-            this::getRobotRelativeSpeeds,
-            (speeds, feedforwards) -> driveRobotRelative(speeds),
-            new PPHolonomicDriveController(
-                    new PIDConstants(5.0, 0.0, 0.0),
-                    new PIDConstants(5.0, 0.0, 0.0)
-            ),
-            config,
-            () -> {
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this
-            );
+       AutoBuilder.configure(
+           this::getPose,
+           this::resetOdometry,
+           this::getRobotRelativeSpeeds,
+           (speeds, feedforwards) -> driveRobotRelative(speeds),
+           new PPHolonomicDriveController(
+                   new PIDConstants(5.0, 0.0, 0.0),
+                   new PIDConstants(5.0, 0.0, 0.0)
+           ),
+           config,
+           () -> {
+             var alliance = DriverStation.getAlliance();
+             if (alliance.isPresent()) {
+               return alliance.get() == DriverStation.Alliance.Red;
+             }
+             return false;
+           },
+           this
+           );
              
     }
 
