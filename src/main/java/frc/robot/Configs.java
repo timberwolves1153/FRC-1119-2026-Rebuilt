@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -63,6 +64,8 @@ public final class Configs {
 
     public final class Intake {
         public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        public static final SparkBaseConfig rollerConfig = null;
+        public static final SparkBaseConfig pivotConfig = null;
 
         static {
             intakeConfig
