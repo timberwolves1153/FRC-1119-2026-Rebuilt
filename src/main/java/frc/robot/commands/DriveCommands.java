@@ -22,11 +22,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -64,16 +66,25 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      BooleanSupplier aSupplier) {
     return Commands.run(
         () -> {
           // Get linear velocity
           Translation2d linearVelocity =
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-          // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          // Apply rotation deadband\
 
+          double omega = 0;
+          double kP = 0.01;
+
+          if (aSupplier.getAsBoolean() == true) {
+            omega =
+                LimelightHelpers.getTX("limelight") * kP * drive.getMaxAngularSpeedRadPerSec() * -1;
+          } else {
+            omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          }
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 

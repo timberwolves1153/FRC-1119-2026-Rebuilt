@@ -8,6 +8,7 @@ public interface IntakeIO {
   public static class IntakeInputs {
     public double deployAppliedVolts = 0;
     public double intakeAppliedVolts = 0;
+    public double retractAppliedVolts = 0;
   }
 
   public default void updateInputs(IntakeInputs inputs) {}
