@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.interpolation.LauncherTable;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -38,6 +42,9 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -52,6 +59,8 @@ public class RobotContainer {
   private final Intake intake;
   private final Indexer indexer;
   private final Shooter shooter;
+  private final Vision vision;
+  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
@@ -66,9 +75,17 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
+        GyroIOPigeon2 gyroIO = new GyroIOPigeon2();
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(),
+        //         new ModuleIOTalonFX(TunerConstants.FrontLeft),
+        //         new ModuleIOTalonFX(TunerConstants.FrontRight),
+        //         new ModuleIOTalonFX(TunerConstants.BackLeft),
+        //         new ModuleIOTalonFX(TunerConstants.BackRight));
         drive =
             new Drive(
-                new GyroIOPigeon2(),
+                gyroIO,
                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
@@ -77,7 +94,10 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX());
         indexer = new Indexer(new IndexerIOVortex());
         shooter = new Shooter(new ShooterIOTalonFX());
-
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOLimelight("limelight", drive::getRotation));
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
         // implementations
@@ -109,6 +129,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim());
         indexer = new Indexer(new IndexerIOSim());
         shooter = new Shooter(new ShooterIOSim());
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
 
       default:
@@ -123,6 +144,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIO() {});
         indexer = new Indexer(new IndexerIO() {});
         shooter = new Shooter(new ShooterIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
@@ -164,6 +186,9 @@ public class RobotContainer {
         "Start Shooter", new InstantCommand(() -> shooter.setShooterVoltage(-12)));
     NamedCommands.registerCommand("Stop Shooter", new InstantCommand(() -> shooter.stopShooter()));
 
+    // Configure Superstructure
+    superstructure =
+        new Superstructure(shooter, indexer, drive::calculateHubDistance, new LauncherTable());
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -179,20 +204,19 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -driveController.getLeftY(),
-            () -> -driveController.getLeftX(),
-            () -> -driveController.getRightX(),
-            () -> driveController.a().getAsBoolean()));
+            () -> driveController.getLeftY(),
+            () -> driveController.getLeftX(),
+            () -> -driveController.getRightX()));
 
-    // Lock to 0° when A button is held
-    // driveController
-    //     .a()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -driveController.getLeftY(),
-    //             () -> -driveController.getLeftX(),
-    //             () -> Rotation2d.kZero));
+    // Lock to hub when A button is held
+    driveController
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driveController.getLeftY(),
+                () -> -driveController.getLeftX(),
+                drive::calculateAimingAngle));
 
     // Switch to X pattern when X button is pressed
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -208,39 +232,52 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // intake movement
-    opController.povDown().onTrue(new InstantCommand(() -> intake.setDeployVoltage(1)));
-    opController.povDown().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-    opController.povUp().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-1)));
-    opController.povUp().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+    // // intake movement
+    driveController.povDown().onTrue(new InstantCommand(() -> intake.setDeployVoltage(1)));
+    driveController.povDown().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+    driveController.povUp().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-1)));
+    driveController.povUp().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
-    // intake
-    opController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
-    opController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    // // intake
+    // opController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
+    // opController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-    opController.rightStick().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(11)));
-    opController.rightStick().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    // opController.rightStick().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(11)));
+    // opController.rightStick().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-    // opController.leftTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(4)));
-    // opController.leftTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
+    // // opController.leftTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(4)));
+    // // opController.leftTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
 
-    opController.rightStick().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(6)));
-    opController.rightStick().onFalse(new InstantCommand(() -> indexer.stopIndex()));
+    // opController.rightStick().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(6)));
+    // opController.rightStick().onFalse(new InstantCommand(() -> indexer.stopIndex()));
 
-    // Shooting
-    opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-8)));
-    opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
+    // // Shooting
+    // opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-8)));
+    // opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
 
-    opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-9)));
-    opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
+    // opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-9)));
+    // opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
 
-    opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(-10)));
-    opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
+    // opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(-10)));
+    // opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
 
-    opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setLoadVoltage(10)));
-    opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopLoad()));
+    // opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setLoadVoltage(10)));
+    // opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopLoad()));
 
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
+
+    // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
+    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
+    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
+    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+
+    opController
+        .leftTrigger()
+        .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.SCORING)));
+    opController
+        .leftTrigger()
+        .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));
   }
 
   /**
@@ -250,5 +287,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public void setGoalHub() {
+    drive.setGoalHub(DriverStation.getAlliance());
   }
 }

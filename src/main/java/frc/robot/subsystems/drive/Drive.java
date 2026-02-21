@@ -7,7 +7,8 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -32,6 +33,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,8 +43,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.FieldConstants;
+import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -97,6 +102,8 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  private Pose2d hubPose = FieldConstants.Hub.redHubCenter;
 
   public Drive(
       GyroIO gyroIO,
@@ -206,6 +213,18 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // Limelight gyro for MT2
+    // LimelightHelpers.SetRobotOrientation("limelight", sampleCount, sampleCount, sampleCount,
+    // sampleCount, sampleCount, sampleCount);
+    LimelightHelpers.SetRobotOrientation(
+        "limelight",
+        poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
+        0,
+        0,
+        0,
+        0,
+        0);
   }
 
   /**
@@ -359,5 +378,41 @@ public class Drive extends SubsystemBase {
 
   public void resetGyro() {
     gyroIO.resetGyro();
+  }
+
+  public void setGoalHub(Optional<Alliance> alliance) {
+    alliance
+        .map(
+            a ->
+                a == Alliance.Red
+                    ? FieldConstants.Hub.redHubCenter
+                    : FieldConstants.Hub.blueHubCenter)
+        .orElse(FieldConstants.Hub.redHubCenter); // or "" or "Unknown"
+  }
+
+  /** Returns the desired Turret Angle. */
+  @AutoLogOutput(key = "Odometry/AimingAngle")
+  public Rotation2d calculateAimingAngle() {
+    // Calculate differences
+    Pose2d robotPose = getPose();
+    double deltaY = hubPose.getY() - robotPose.getY();
+    double deltaX = hubPose.getX() - robotPose.getX();
+
+    // Calculate angle in radians (using Math.Atan2 or similar)
+    double angleRad = Math.atan2(deltaY, deltaX);
+    double angleDegrees = Units.radiansToDegrees(angleRad);
+    double boundedDegrees = (angleDegrees + 360) % 360;
+    return Rotation2d.fromDegrees(boundedDegrees);
+  }
+
+  /** Returns the distance from hub */
+  @AutoLogOutput(key = "Odometry/HubDistance")
+  public double calculateHubDistance() {
+    // Get Robot pose
+    Pose2d robotPose = getPose();
+
+    // Calculate distance (result is in meters)
+    double distance = robotPose.getTranslation().getDistance(hubPose.getTranslation());
+    return distance;
   }
 }
