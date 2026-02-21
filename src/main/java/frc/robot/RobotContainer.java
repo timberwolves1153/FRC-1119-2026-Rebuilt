@@ -238,6 +238,12 @@ public class RobotContainer {
     driveController.povUp().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-1)));
     driveController.povUp().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
+    driveController.rightTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
+    driveController.rightTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+
+    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-2)));
+    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+
     // // intake
     // opController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
     // opController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
@@ -267,14 +273,20 @@ public class RobotContainer {
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
     // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
-    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
-    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
-    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
-    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+    opController.a().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
+    opController.a().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
+    opController.a().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    opController.a().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
 
     opController
-        .leftTrigger()
+        .rightTrigger()
         .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.SCORING)));
+    opController
+        .rightTrigger()
+        .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));
+    opController
+        .leftTrigger()
+        .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.REVERSE)));
     opController
         .leftTrigger()
         .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));

@@ -22,7 +22,8 @@ public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
     OFF,
     PASSING,
-    SCORING
+    SCORING,
+    REVERSE
   }
 
   public Superstructure(
@@ -48,6 +49,12 @@ public class Superstructure extends SubsystemBase {
     //     launcherTable.getLaunchVoltageSupplier(distanceSupplier.get()).getAsDouble());
   }
 
+  public void getUnstuck() {
+    indexer.setIndexVoltage(5);
+    indexer.setLoadVoltage(-12);
+    launcher.setShooterVoltage(-9);
+  }
+
   public void stopEverything() {
     indexer.stopIndex();
     indexer.stopLoad();
@@ -69,6 +76,11 @@ public class Superstructure extends SubsystemBase {
       case PASSING:
         {
           stopEverything();
+          break;
+        }
+      case REVERSE:
+        {
+          getUnstuck();
           break;
         }
       case OFF:
