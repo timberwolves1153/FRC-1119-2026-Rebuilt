@@ -238,6 +238,12 @@ public class RobotContainer {
     opController.a().onFalse(new InstantCommand(() -> intake.stopIntake()));
     opController.a().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
 
+    opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
+    opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
+    opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    opController.b().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+    
+
     opController
         .rightTrigger()
         .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.SCORING)));
