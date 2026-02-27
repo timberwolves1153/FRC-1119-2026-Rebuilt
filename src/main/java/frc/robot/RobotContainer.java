@@ -231,9 +231,6 @@ public class RobotContainer {
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
     // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
-    opController.a().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-12)));
-    opController.a().onFalse(new InstantCommand(() -> intake.stopIntake()));
-
     // opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
     // opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
     // opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
@@ -254,6 +251,7 @@ public class RobotContainer {
 
     opController.x().onTrue(intake.deployCommand());
     opController.y().onTrue(intake.retractCommand());
+    opController.a().onTrue(intake.intakeCommand());
   }
 
   /**

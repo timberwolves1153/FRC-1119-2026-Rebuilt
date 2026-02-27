@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
@@ -25,7 +26,6 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.Intake.Position;
-import java.util.function.BooleanSupplier;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private TalonFX deployMotor = new TalonFX(41);
@@ -46,7 +46,8 @@ public class IntakeIOTalonFX implements IntakeIO {
       Constants.krakenX60FreeSpeed.div(deployMotorReduction);
   private final MotionMagicVoltage deployMotionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
-  private final double DEPLOY_STALL_CURRENT_AMPS = .89;
+  private static final double DEPLOY_STALL_CURRENT_AMPS = .89;
+  private static final Angle DEPLOY_POSITION_TOLERANCE = Degrees.of(5);
 
   public IntakeIOTalonFX() {
     configIntakeMotor();
@@ -116,10 +117,18 @@ public class IntakeIOTalonFX implements IntakeIO {
     intakeMotor.setVoltage(volts);
   }
 
+  private boolean isPositionWithinTolerance(Angle targetPosition) {
+      final Angle currentPosition = deployMotor.getPosition().getValue();
+      //final Angle targetPosition = deployMotionMagicRequest.getPositionMeasure();
+      return currentPosition.isNear(targetPosition, DEPLOY_POSITION_TOLERANCE);
+  }
+
   @Override
   public void updateInputs(IntakeInputs inputs) {
     inputs.deployAppliedVolts = deployMotor.getMotorVoltage().getValue().in(Volts);
     inputs.deployCurrentValue = deployMotor.getSupplyCurrent().getValue().in(Amps);
+
+    inputs.intakeAppliedVolts = intakeAppliedVolts.getValue().in(Volts);
 
     inputs.intakeDeployDegrees =
         Units.rotationsToDegrees(deployMotor.getPosition().getValueAsDouble());
@@ -143,15 +152,19 @@ public class IntakeIOTalonFX implements IntakeIO {
               setDeployVoltage(Intake.HOMING_SPEED);
             }
           }
+          break;
         }
+      case AGITATE: {
+        if (isPositionWithinTolerance(Position.AGITATE.angle())) { //We're near the agitate position so go to Deployed
+            deployMotor.setControl(deployMotionMagicRequest.withPosition(Position.DEPLOYED.angle()));
+        } else if (isPositionWithinTolerance(Position.DEPLOYED.angle())) { //We're near the deployed position so go to Agitate
+            deployMotor.setControl(deployMotionMagicRequest.withPosition(Position.AGITATE.angle()));
+        }
+        break;
+      }
       default:
         break;
     }
-  }
-
-  @Override
-  public BooleanSupplier isDeployStalled() {
-    return () -> deployCurrentValue.getValue().in(Amps) > DEPLOY_STALL_CURRENT_AMPS;
   }
 
   @Override
