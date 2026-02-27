@@ -131,13 +131,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
 
     NamedCommands.registerCommand(
-        "Start Indexing", new InstantCommand(() -> indexer.setIndexVoltage(-6)));
+        "Start Indexing", new InstantCommand(() -> indexer.setIndexVoltage(-10)));
     NamedCommands.registerCommand("Stop Indexing", new InstantCommand(() -> indexer.stopIndex()));
     NamedCommands.registerCommand(
-        "Start Loading", new InstantCommand(() -> indexer.setLoadVoltage(-12)));
+        "Start Loading", new InstantCommand(() -> indexer.setLoadVoltage(12)));
     NamedCommands.registerCommand("Stop Loading", new InstantCommand(() -> indexer.stopLoad()));
     NamedCommands.registerCommand(
-        "Start Shooter", new InstantCommand(() -> shooter.setShooterVoltage(-12)));
+        "Start Shooter", new InstantCommand(() -> shooter.setShooterVoltage(-9)));
     NamedCommands.registerCommand("Stop Shooter", new InstantCommand(() -> shooter.stopShooter()));
 
     // Configure Superstructure
@@ -194,9 +194,11 @@ public class RobotContainer {
 
     // driveController.rightTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
     // driveController.rightTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+    opController.rightBumper().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
+    opController.rightBumper().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
-    driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-2)));
-    driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+    opController.leftBumper().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-2)));
+    opController.leftBumper().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
     // // intake
     // opController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
@@ -227,10 +229,15 @@ public class RobotContainer {
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
     // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
-    opController.a().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
+    opController.a().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-12)));
     opController.a().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
     opController.a().onFalse(new InstantCommand(() -> intake.stopIntake()));
     opController.a().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+
+    opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
+    opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
+    opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    opController.b().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
 
     opController
         .rightTrigger()
