@@ -37,5 +37,12 @@ public class IntakeIOSim implements IntakeIO {
 
     inputs.deployAppliedVolts = deployMotor.getInputVoltage();
     inputs.intakeAppliedVolts = intakeMotor.getInputVoltage();
+    switch (inputs.state) {
+      case DEPLOYED:
+        break;
+      case STOWED:
+      default:
+        break;
+    }
   }
 }

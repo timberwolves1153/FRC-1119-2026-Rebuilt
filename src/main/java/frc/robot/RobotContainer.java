@@ -127,15 +127,9 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    NamedCommands.registerCommand(
-        "Start Intake", new InstantCommand(() -> intake.setIntakeVoltage(-12)));
-    NamedCommands.registerCommand("Stop Intake", new InstantCommand(() -> intake.stopIntake()));
-    NamedCommands.registerCommand(
-        "Deploy Intake", new InstantCommand(() -> intake.setDeployVoltage(4)));
-    NamedCommands.registerCommand(
-        "Stop Deploy Intake", new InstantCommand(() -> intake.stopDeploy()));
-    NamedCommands.registerCommand(
-        "Bring in Intake", new InstantCommand(() -> intake.setDeployVoltage(-4)));
+    NamedCommands.registerCommand("Start Collecting", intake.intakeCommand());
+    NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
+
     NamedCommands.registerCommand(
         "Start Indexing", new InstantCommand(() -> indexer.setIndexVoltage(-6)));
     NamedCommands.registerCommand("Stop Indexing", new InstantCommand(() -> indexer.stopIndex()));
@@ -198,8 +192,8 @@ public class RobotContainer {
     driveController.povUp().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-1)));
     driveController.povUp().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
-    driveController.rightTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
-    driveController.rightTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
+    // driveController.rightTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
+    // driveController.rightTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
 
     driveController.leftTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-2)));
     driveController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
@@ -250,6 +244,13 @@ public class RobotContainer {
     opController
         .leftTrigger()
         .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));
+
+    opController.x().onTrue(intake.deployCommand());
+    opController.y().onTrue(intake.retractCommand());
+    opController
+        .b()
+        .onTrue(
+            new InstantCommand(() -> intake.setDeployMotorPosition(Intake.Position.HOMED.angle())));
   }
 
   /**

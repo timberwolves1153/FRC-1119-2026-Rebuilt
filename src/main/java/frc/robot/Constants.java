@@ -7,6 +7,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RPM;
+
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -34,4 +37,6 @@ public final class Constants {
   public static void disableHAL() {
     disableHAL = true;
   }
+
+  public static AngularVelocity krakenX60FreeSpeed = RPM.of(6000);
 }

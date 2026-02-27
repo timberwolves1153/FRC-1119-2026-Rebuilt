@@ -49,6 +49,14 @@ public class Superstructure extends SubsystemBase {
     //     launcherTable.getLaunchVoltageSupplier(distanceSupplier.get()).getAsDouble());
   }
 
+  public void sendIt() {
+    indexer.setIndexVoltage(-12);
+    indexer.setLoadVoltage(12);
+    launcher.setShooterVoltage(-12);
+    // launcher.setShooterVoltage(
+    //     launcherTable.getLaunchVoltageSupplier(distanceSupplier.get()).getAsDouble());
+  }
+
   public void getUnstuck() {
     indexer.setIndexVoltage(5);
     indexer.setLoadVoltage(-12);
