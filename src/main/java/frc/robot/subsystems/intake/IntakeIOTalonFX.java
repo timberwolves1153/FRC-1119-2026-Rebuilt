@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -44,7 +46,7 @@ public class IntakeIOTalonFX implements IntakeIO {
       Constants.krakenX60FreeSpeed.div(deployMotorReduction);
   private final MotionMagicVoltage deployMotionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
-  private final double DEPLOY_STALL_CURRENT_AMPS = 6;
+  private final double DEPLOY_STALL_CURRENT_AMPS = .89;
 
   public IntakeIOTalonFX() {
     configIntakeMotor();
@@ -116,9 +118,11 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeInputs inputs) {
-    inputs.deployAppliedVolts = deployAppliedVolts.getValueAsDouble();
-    inputs.intakeAppliedVolts = intakeAppliedVolts.getValueAsDouble();
-    inputs.intakeDeployDegrees = deployMotor.getPosition().getValue();
+    inputs.deployAppliedVolts = deployMotor.getMotorVoltage().getValue().in(Volts);
+    inputs.deployCurrentValue = deployMotor.getSupplyCurrent().getValue().in(Amps);
+
+    inputs.intakeDeployDegrees =
+        Units.rotationsToDegrees(deployMotor.getPosition().getValueAsDouble());
 
     switch (inputs.state) {
       case DEPLOYED:
@@ -127,6 +131,19 @@ public class IntakeIOTalonFX implements IntakeIO {
       case STOWED:
         deployMotor.setControl(deployMotionMagicRequest.withPosition(Position.STOWED.angle()));
         break;
+      case HOMED:
+        {
+          if (inputs.isHomed) {
+            inputs.state = Position.STOWED;
+          } else {
+            if (deployCurrentValue.getValue().in(Amps) > DEPLOY_STALL_CURRENT_AMPS) {
+              setDeployMotorPosition(Position.HOMED.angle());
+              inputs.isHomed = true;
+            } else {
+              setDeployVoltage(Intake.HOMING_SPEED);
+            }
+          }
+        }
       default:
         break;
     }

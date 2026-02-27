@@ -4,20 +4,17 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
   public IntakeIO intakeIO;
   public IntakeInputsAutoLogged intakeInputs;
-  public boolean isHomed = false;
 
   public enum Position {
-    HOMED(110), // DETERMINE THIS ANGLE
-    STOWED(100), // DETERMINE THIS ANGLE
-    DEPLOYED(-4); // DETERMINE THIS ANGLE
+    HOMED(100), // DETERMINE THIS ANGLE
+    STOWED(117.5), // DETERMINE THIS ANGLE
+    DEPLOYED(220.8); // DETERMINE THIS ANGLE
 
     private final double degrees;
 
@@ -33,7 +30,7 @@ public class Intake extends SubsystemBase {
   public static final double INTAKE_SPEED = -11;
   public static final double STOP_SPEED = 0;
 
-  public static final double HOMING_SPEED = 0.1;
+  public static final double HOMING_SPEED = -0.5;
 
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
@@ -62,6 +59,10 @@ public class Intake extends SubsystemBase {
 
   public void setDeployMotorPosition(Angle angle) {
     intakeIO.setDeployMotorPosition(angle);
+  }
+
+  public void setIsHomed(boolean isHomed) {
+    intakeInputs.isHomed = isHomed;
   }
 
   public Command intakeCommand() {
@@ -94,17 +95,11 @@ public class Intake extends SubsystemBase {
   }
 
   public Command homingCommand() {
-    return Commands.sequence(
-            runOnce(() -> setDeployVoltage(HOMING_SPEED)),
-            Commands.waitUntil(intakeIO.isDeployStalled()),
-            runOnce(
-                () -> {
-                  intakeIO.setDeployMotorPosition(Position.HOMED.angle());
-                  isHomed = true;
-                  setPosition(Position.STOWED);
-                }))
-        .unless(() -> isHomed)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    return startEnd(
+        () -> {
+          setPosition(Position.HOMED);
+        },
+        () -> stopDeploy());
   }
 
   public void periodic() {

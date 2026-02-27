@@ -34,6 +34,7 @@ import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerIOSim;
 import frc.robot.subsystems.indexer.IndexerIOVortex;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.Intake.Position;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -90,6 +91,7 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOLimelight("limelight", drive::getRotation));
+        intake.setDeployMotorPosition(Position.HOMED.angle());
         break;
 
       case SIM:
@@ -230,14 +232,12 @@ public class RobotContainer {
 
     // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
     opController.a().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-12)));
-    opController.a().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
     opController.a().onFalse(new InstantCommand(() -> intake.stopIntake()));
-    opController.a().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
 
-    opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
-    opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
-    opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
-    opController.b().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+    // opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
+    // opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
+    // opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
+    // opController.b().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
 
     opController
         .rightTrigger()
@@ -254,10 +254,6 @@ public class RobotContainer {
 
     opController.x().onTrue(intake.deployCommand());
     opController.y().onTrue(intake.retractCommand());
-    opController
-        .b()
-        .onTrue(
-            new InstantCommand(() -> intake.setDeployMotorPosition(Intake.Position.HOMED.angle())));
   }
 
   /**
