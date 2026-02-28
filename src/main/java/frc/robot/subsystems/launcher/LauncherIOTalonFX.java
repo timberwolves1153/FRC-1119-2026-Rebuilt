@@ -115,9 +115,9 @@ public class LauncherIOTalonFX implements LauncherIO {
 
   @Override
   public void updateInputs(LauncherInputs inputs) {
-    inputs.leftLauncherAppliedVolts = leftAppliedVolts.getValue().in(Volts);
-    inputs.leftLauncherCurrentAmps = leftCurrentValue.getValue().in(Amps);
-    inputs.leftLauncherVelovityRPM = leftVelocity.getValue().in(RPM);
+    inputs.leftLauncherAppliedVolts = leftMotor.getMotorVoltage().getValue().in(Volts);
+    inputs.leftLauncherCurrentAmps = leftMotor.getSupplyCurrent().getValue().in(Amps);
+    inputs.leftLauncherVelovityRPM = leftMotor.getVelocity().getValue().in(RPM);
 
     inputs.centerLauncherAppliedVolts = centerAppliedVolts.getValue().in(Volts);
     inputs.centerLauncherCurrentAmps = centerCurrentValue.getValue().in(Amps);

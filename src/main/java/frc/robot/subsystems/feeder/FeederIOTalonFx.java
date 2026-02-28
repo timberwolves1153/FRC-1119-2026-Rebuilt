@@ -46,7 +46,7 @@ public class FeederIOTalonFx implements FeederIO {
 
   @Override
   public void updateInputs(FeederInputs inputs) {
-    inputs.feederAppliedVolts = feederAppliedVolts.getValue().in(Volts);
-    inputs.feederCurrentAmps = feederCurrentValue.getValue().in(Amps);
+    inputs.feederAppliedVolts = feederMotor.getMotorVoltage().getValue().in(Volts);
+    inputs.feederCurrentAmps = feederMotor.getSupplyCurrent().getValue().in(Amps);
   }
 }

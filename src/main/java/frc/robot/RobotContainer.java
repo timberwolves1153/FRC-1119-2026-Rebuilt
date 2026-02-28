@@ -45,7 +45,6 @@ import frc.robot.subsystems.launcher.LauncherIO;
 import frc.robot.subsystems.launcher.LauncherIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -91,10 +90,8 @@ public class RobotContainer {
         floor = new Floor(new FloorIOVortex());
         feeder = new Feeder(new FeederIOTalonFx());
         launcher = new Launcher(new LauncherIOTalonFX());
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight("limelight", drive::getRotation));
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        // new VisionIOLimelight("limelight", drive::getRotation));
         intake.setDeployMotorPosition(Position.HOMED.angle());
         break;
 
@@ -185,13 +182,16 @@ public class RobotContainer {
 
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
-    opController.rightTrigger().onTrue(superstructureCommands.launchWhenReady());
+    opController.rightTrigger().onTrue(superstructureCommands.launchManually());
+    opController.rightTrigger().onFalse(superstructureCommands.stop());
 
     opController.leftTrigger().onTrue(superstructureCommands.launchManually());
+    opController.leftTrigger().onFalse(superstructureCommands.stop());
 
-    opController.x().onTrue(intake.deployCommand());
-    opController.y().onTrue(intake.retractCommand());
+    opController.rightBumper().onTrue(intake.deployCommand());
+    opController.leftBumper().onTrue(intake.retractCommand());
     opController.a().onTrue(intake.intakeCommand());
+    opController.b().onTrue(intake.stopIntakeCommand());
   }
 
   /**
