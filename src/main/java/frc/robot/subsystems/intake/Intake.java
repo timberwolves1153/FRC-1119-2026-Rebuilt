@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -14,9 +13,9 @@ public class Intake extends SubsystemBase {
 
   public enum Position {
     HOMED(100),
-    STOWED(117.5), 
-    AGITATE(169.15), 
-    DEPLOYED(220.8); 
+    STOWED(117.5),
+    AGITATE(169.15),
+    DEPLOYED(220.8);
 
     private final double degrees;
 
@@ -101,11 +100,12 @@ public class Intake extends SubsystemBase {
   }
 
   public Command agitateCommand() {
-      return runOnce(() -> setIntakeVoltage(INTAKE_SPEED))
-            .andThen(setAgitatePositionCommand())
-            .handleInterrupt(() -> {
-                setPosition(Position.DEPLOYED);
-                stopIntake();
+    return runOnce(() -> setIntakeVoltage(INTAKE_SPEED))
+        .andThen(setAgitatePositionCommand())
+        .handleInterrupt(
+            () -> {
+              setPosition(Position.DEPLOYED);
+              stopIntake();
             });
   }
 

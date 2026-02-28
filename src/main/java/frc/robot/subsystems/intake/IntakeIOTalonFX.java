@@ -118,9 +118,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   private boolean isPositionWithinTolerance(Angle targetPosition) {
-      final Angle currentPosition = deployMotor.getPosition().getValue();
-      //final Angle targetPosition = deployMotionMagicRequest.getPositionMeasure();
-      return currentPosition.isNear(targetPosition, DEPLOY_POSITION_TOLERANCE);
+    final Angle currentPosition = deployMotor.getPosition().getValue();
+    // final Angle targetPosition = deployMotionMagicRequest.getPositionMeasure();
+    return currentPosition.isNear(targetPosition, DEPLOY_POSITION_TOLERANCE);
   }
 
   @Override
@@ -154,14 +154,18 @@ public class IntakeIOTalonFX implements IntakeIO {
           }
           break;
         }
-      case AGITATE: {
-        if (isPositionWithinTolerance(Position.AGITATE.angle())) { //We're near the agitate position so go to Deployed
-            deployMotor.setControl(deployMotionMagicRequest.withPosition(Position.DEPLOYED.angle()));
-        } else if (isPositionWithinTolerance(Position.DEPLOYED.angle())) { //We're near the deployed position so go to Agitate
+      case AGITATE:
+        {
+          if (isPositionWithinTolerance(
+              Position.AGITATE.angle())) { // We're near the agitate position so go to Deployed
+            deployMotor.setControl(
+                deployMotionMagicRequest.withPosition(Position.DEPLOYED.angle()));
+          } else if (isPositionWithinTolerance(
+              Position.DEPLOYED.angle())) { // We're near the deployed position so go to Agitate
             deployMotor.setControl(deployMotionMagicRequest.withPosition(Position.AGITATE.angle()));
+          }
+          break;
         }
-        break;
-      }
       default:
         break;
     }

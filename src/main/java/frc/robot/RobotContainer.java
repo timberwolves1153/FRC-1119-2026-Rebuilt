@@ -19,29 +19,30 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SuperstructureCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.interpolation.LauncherTable;
-import frc.robot.subsystems.Superstructure;
-import frc.robot.subsystems.Superstructure.SuperstructureState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.indexer.IndexerIO;
-import frc.robot.subsystems.indexer.IndexerIOSim;
-import frc.robot.subsystems.indexer.IndexerIOVortex;
+import frc.robot.subsystems.feeder.Feeder;
+import frc.robot.subsystems.feeder.FeederIO;
+import frc.robot.subsystems.feeder.FeederIOSim;
+import frc.robot.subsystems.feeder.FeederIOTalonFx;
+import frc.robot.subsystems.floor.Floor;
+import frc.robot.subsystems.floor.FloorIO;
+import frc.robot.subsystems.floor.FloorIOSim;
+import frc.robot.subsystems.floor.FloorIOVortex;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.Position;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.ShooterIOSim;
-import frc.robot.subsystems.shooter.ShooterIOTalonFX;
+import frc.robot.subsystems.launcher.Launcher;
+import frc.robot.subsystems.launcher.LauncherIO;
+import frc.robot.subsystems.launcher.LauncherIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -57,16 +58,18 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Intake intake;
-  private final Indexer indexer;
-  private final Shooter shooter;
+  private final Floor floor;
+  private final Feeder feeder;
+  private final Launcher launcher;
   private final Vision vision;
-  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
   private final CommandXboxController opController = new CommandXboxController(1);
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  private final SuperstructureCommands superstructureCommands;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -85,8 +88,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         intake = new Intake(new IntakeIOTalonFX());
-        indexer = new Indexer(new IndexerIOVortex());
-        shooter = new Shooter(new ShooterIOTalonFX());
+        floor = new Floor(new FloorIOVortex());
+        feeder = new Feeder(new FeederIOTalonFx());
+        launcher = new Launcher(new LauncherIOTalonFX());
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -104,8 +108,9 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         intake = new Intake(new IntakeIOSim());
-        indexer = new Indexer(new IndexerIOSim());
-        shooter = new Shooter(new ShooterIOSim());
+        floor = new Floor(new FloorIOSim());
+        feeder = new Feeder(new FeederIOSim());
+        launcher = new Launcher(new LauncherIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
 
@@ -119,8 +124,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         intake = new Intake(new IntakeIO() {});
-        indexer = new Indexer(new IndexerIO() {});
-        shooter = new Shooter(new ShooterIO() {});
+        floor = new Floor(new FloorIO() {});
+        feeder = new Feeder(new FeederIO() {});
+        launcher = new Launcher(new LauncherIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
@@ -132,19 +138,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Start Collecting", intake.intakeCommand());
     NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
 
-    NamedCommands.registerCommand(
-        "Start Indexing", new InstantCommand(() -> indexer.setIndexVoltage(-10)));
-    NamedCommands.registerCommand("Stop Indexing", new InstantCommand(() -> indexer.stopIndex()));
-    NamedCommands.registerCommand(
-        "Start Loading", new InstantCommand(() -> indexer.setLoadVoltage(12)));
-    NamedCommands.registerCommand("Stop Loading", new InstantCommand(() -> indexer.stopLoad()));
-    NamedCommands.registerCommand(
-        "Start Shooter", new InstantCommand(() -> shooter.setShooterVoltage(-9)));
-    NamedCommands.registerCommand("Stop Shooter", new InstantCommand(() -> shooter.stopShooter()));
-
     // Configure Superstructure
-    superstructure =
-        new Superstructure(shooter, indexer, drive::calculateHubDistance, new LauncherTable());
+    superstructureCommands = new SuperstructureCommands(drive, intake, floor, feeder, launcher);
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -188,66 +183,11 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // // intake movement
-    driveController.povDown().onTrue(new InstantCommand(() -> intake.setDeployVoltage(1)));
-    driveController.povDown().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-    driveController.povUp().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-1)));
-    driveController.povUp().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-
-    // driveController.rightTrigger().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
-    // driveController.rightTrigger().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-    opController.rightBumper().onTrue(new InstantCommand(() -> intake.setDeployVoltage(2)));
-    opController.rightBumper().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-
-    opController.leftBumper().onTrue(new InstantCommand(() -> intake.setDeployVoltage(-2)));
-    opController.leftBumper().onFalse(new InstantCommand(() -> intake.stopDeploy()));
-
-    // // intake
-    // opController.leftTrigger().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(-11)));
-    // opController.leftTrigger().onFalse(new InstantCommand(() -> intake.stopIntake()));
-
-    // opController.rightStick().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(11)));
-    // opController.rightStick().onFalse(new InstantCommand(() -> intake.stopIntake()));
-
-    // // opController.leftTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(4)));
-    // // opController.leftTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
-
-    // opController.rightStick().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(6)));
-    // opController.rightStick().onFalse(new InstantCommand(() -> indexer.stopIndex()));
-
-    // // Shooting
-    // opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-8)));
-    // opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
-
-    // opController.rightTrigger().onTrue(new InstantCommand(() -> shooter.setShooterVoltage(-9)));
-    // opController.rightTrigger().onFalse(new InstantCommand(() -> shooter.stopShooter()));
-
-    // opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setIndexVoltage(-10)));
-    // opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopIndex()));
-
-    // opController.rightTrigger().onTrue(new InstantCommand(() -> indexer.setLoadVoltage(10)));
-    // opController.rightTrigger().onFalse(new InstantCommand(() -> indexer.stopLoad()));
-
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
-    // driveController.rightTrigger().onTrue(new InstantCommand(() -> shooter.));
-    // opController.b().onTrue(new InstantCommand(() -> intake.setIntakeVoltage(8)));
-    // opController.b().onTrue(new InstantCommand(() -> intake.setDeployVoltage(.25)));
-    // opController.b().onFalse(new InstantCommand(() -> intake.stopIntake()));
-    // opController.b().onFalse(new InstantCommand(() -> intake.setDeployVoltage(0)));
+    opController.rightTrigger().onTrue(superstructureCommands.launchWhenReady());
 
-    opController
-        .rightTrigger()
-        .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.SCORING)));
-    opController
-        .rightTrigger()
-        .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));
-    opController
-        .leftTrigger()
-        .onTrue(new InstantCommand(() -> superstructure.setState(SuperstructureState.REVERSE)));
-    opController
-        .leftTrigger()
-        .onFalse(new InstantCommand(() -> superstructure.setState(SuperstructureState.OFF)));
+    opController.leftTrigger().onTrue(superstructureCommands.launchManually());
 
     opController.x().onTrue(intake.deployCommand());
     opController.y().onTrue(intake.retractCommand());
