@@ -408,6 +408,7 @@ public class Drive extends SubsystemBase {
   /** Returns the distance from hub */
   @AutoLogOutput(key = "Odometry/HubDistance")
   public double calculateHubDistance() {
+    Logger.recordOutput("Odometry/HubPose", hubPose);
     // Get Robot pose
     Pose2d robotPose = getPose();
 

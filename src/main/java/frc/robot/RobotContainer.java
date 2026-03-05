@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SuperstructureCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -43,8 +44,7 @@ import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.launcher.Launcher;
 import frc.robot.subsystems.launcher.LauncherIO;
 import frc.robot.subsystems.launcher.LauncherIOTalonFX;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
+import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -60,7 +60,7 @@ public class RobotContainer {
   private final Floor floor;
   private final Feeder feeder;
   private final Launcher launcher;
-  private final Vision vision;
+  private final Limelight vision;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
@@ -90,10 +90,7 @@ public class RobotContainer {
         floor = new Floor(new FloorIOVortex());
         feeder = new Feeder(new FeederIOTalonFx());
         launcher = new Launcher(new LauncherIOTalonFX());
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIO() {}); // new VisionIOLimelight("limelight", drive::getRotation));
+        vision = new Limelight("limelight");
         intake.setDeployMotorPosition(Position.HOMED.angle());
         break;
 
@@ -110,7 +107,7 @@ public class RobotContainer {
         floor = new Floor(new FloorIOSim());
         feeder = new Feeder(new FeederIOSim());
         launcher = new Launcher(new LauncherIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        vision = new Limelight("limelight");
         break;
 
       default:
@@ -126,7 +123,7 @@ public class RobotContainer {
         floor = new Floor(new FloorIO() {});
         feeder = new Feeder(new FeederIO() {});
         launcher = new Launcher(new LauncherIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        vision = new Limelight("limelight");
         break;
     }
 
@@ -144,6 +141,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
     NamedCommands.registerCommand("Start Firing", superstructureCommands.launchManually());
     NamedCommands.registerCommand("Stop Firing", superstructureCommands.stop());
+
+    vision.setDefaultCommand(updateVisionCommand());
   }
 
   /**
@@ -210,5 +209,21 @@ public class RobotContainer {
 
   public void setGoalHub() {
     drive.setGoalHub(DriverStation.getAlliance());
+  }
+
+  private Command updateVisionCommand() {
+    return vision
+        .run(
+            () -> {
+              final Pose2d currentRobotPose = drive.getPose();
+              final Optional<Limelight.Measurement> measurement =
+                  vision.getMeasurement(currentRobotPose);
+              measurement.ifPresent(
+                  m -> {
+                    drive.addVisionMeasurement(
+                        m.poseEstimate.pose, m.poseEstimate.timestampSeconds, m.standardDeviations);
+                  });
+            })
+        .ignoringDisable(true);
   }
 }

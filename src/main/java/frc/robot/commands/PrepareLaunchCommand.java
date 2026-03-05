@@ -28,9 +28,12 @@ public class PrepareLaunchCommand extends Command {
               Interpolator.forDouble().interpolate(startValue, endValue, t));
 
   static {
-    distanceToRPMMap.put(Inches.of(52.0), 2800.0);
-    distanceToRPMMap.put(Inches.of(114.4), 3275.0);
-    distanceToRPMMap.put(Inches.of(165.5), 3650.0);
+    // distanceToRPMMap.put(Inches.of(52.0), 2800.0);
+    // distanceToRPMMap.put(Inches.of(114.4), 3275.0);
+    // distanceToRPMMap.put(Inches.of(165.5), 3650.0);
+    distanceToRPMMap.put(Meters.of(2.76), 2800.0);
+    distanceToRPMMap.put(Meters.of(3.539), 3150.0);
+    distanceToRPMMap.put(Inches.of(196), 3500.0);
   }
 
   private final Launcher launcher;
