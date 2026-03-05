@@ -17,19 +17,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Start Shooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Indexing"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Loading"
+                  "name": "Start Firing"
                 }
               }
             ]
@@ -48,19 +36,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Stop Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Indexing"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooter"
+                  "name": "Stop Firing"
                 }
               }
             ]

@@ -90,8 +90,10 @@ public class RobotContainer {
         floor = new Floor(new FloorIOVortex());
         feeder = new Feeder(new FeederIOTalonFx());
         launcher = new Launcher(new LauncherIOTalonFX());
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
-        // new VisionIOLimelight("limelight", drive::getRotation));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIO() {}); // new VisionIOLimelight("limelight", drive::getRotation));
         intake.setDeployMotorPosition(Position.HOMED.angle());
         break;
 
@@ -132,13 +134,16 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    NamedCommands.registerCommand("Start Collecting", intake.intakeCommand());
-    NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
 
     // Configure Superstructure
     superstructureCommands = new SuperstructureCommands(drive, intake, floor, feeder, launcher);
     // Configure the button bindings
     configureButtonBindings();
+
+    NamedCommands.registerCommand("Start Collecting", intake.intakeCommand());
+    NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
+    NamedCommands.registerCommand("Start Firing", superstructureCommands.launchManually());
+    NamedCommands.registerCommand("Stop Firing", superstructureCommands.stop());
   }
 
   /**
@@ -162,8 +167,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -driveController.getLeftY(),
-                () -> -driveController.getLeftX(),
+                () -> driveController.getLeftY(),
+                () -> driveController.getLeftX(),
                 drive::calculateAimingAngle));
 
     // Switch to X pattern when X button is pressed

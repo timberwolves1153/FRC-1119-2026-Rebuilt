@@ -33,10 +33,10 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 1.0,
-      "maxWaypointRelativePos": 0.7604049493813184,
+      "maxWaypointRelativePos": 0.8172757475083017,
       "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 1.0,
+        "maxVelocity": 1.0,
+        "maxAcceleration": 0.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,20 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Deploy Intake",
-      "waypointRelativePos": 0.36445444319460063,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Stop Deploy Intake",
-      "waypointRelativePos": 0.5939257592800898,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.800899887514055,
+      "name": "Start Collecting",
+      "waypointRelativePos": 0.7641196013289124,
       "endWaypointRelativePos": null,
       "command": null
     }

@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -12,10 +13,10 @@ public class Intake extends SubsystemBase {
   public IntakeInputsAutoLogged intakeInputs;
 
   public enum Position {
-    HOMED(100),
-    STOWED(117.5),
-    AGITATE(169.15),
-    DEPLOYED(220.8);
+    HOMED(8),
+    STOWED(28.5),
+    AGITATE(51.25),
+    DEPLOYED(137);
 
     private final double degrees;
 
@@ -36,6 +37,7 @@ public class Intake extends SubsystemBase {
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
     this.intakeInputs = new IntakeInputsAutoLogged();
+    SmartDashboard.putNumber("deployAngle", 110);
   }
 
   public void setDeployVoltage(double volts) {
@@ -91,6 +93,7 @@ public class Intake extends SubsystemBase {
     return startEnd(
         () -> {
           setPosition(Position.STOWED);
+          setIntakeVoltage(STOP_SPEED);
         },
         () -> stopDeploy());
   }
@@ -115,6 +118,15 @@ public class Intake extends SubsystemBase {
           setPosition(Position.HOMED);
         },
         () -> stopDeploy());
+  }
+
+  public Command dashboardDeployCommand() {
+    return defer(
+        () ->
+            run(
+                () ->
+                    setDeployMotorPosition(
+                        Degrees.of(SmartDashboard.getNumber("deployAngle", 110)))));
   }
 
   public void periodic() {

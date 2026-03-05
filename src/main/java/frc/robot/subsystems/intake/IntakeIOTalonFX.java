@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.Intake.Position;
 
@@ -169,6 +170,8 @@ public class IntakeIOTalonFX implements IntakeIO {
       default:
         break;
     }
+
+    SmartDashboard.putNumber("Deploy Angle", deployMotor.getPosition().getValueAsDouble());
   }
 
   @Override

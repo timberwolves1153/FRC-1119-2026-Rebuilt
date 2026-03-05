@@ -14,7 +14,7 @@ public class Launcher extends SubsystemBase {
     this.launcherIO = launcherIO;
     this.launcherInputs = new LauncherInputsAutoLogged();
 
-    SmartDashboard.putNumber("LauncherSpeedRPM", 0);
+    SmartDashboard.putNumber("LauncherSpeedRPM", 2000);
   }
 
   @Override
@@ -45,6 +45,6 @@ public class Launcher extends SubsystemBase {
   }
 
   public Command dashboardSpinUpCommand() {
-    return defer(() -> spinUpCommand(SmartDashboard.getNumber("LauncherSpeedRPM", 0)));
+    return defer(() -> spinUpCommand(-SmartDashboard.getNumber("LauncherSpeedRPM", 2000)));
   }
 }

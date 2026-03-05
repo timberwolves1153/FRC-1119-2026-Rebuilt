@@ -35,8 +35,8 @@
       "minWaypointRelativePos": 0.6906636670416254,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 1.0,
+        "maxVelocity": 1.0,
+        "maxAcceleration": 0.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,20 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Deploy Intake",
-      "waypointRelativePos": 0.23397075365579512,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Stop Deploy Intake",
-      "waypointRelativePos": 0.350956130483685,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.8098987626546713,
+      "name": "Start Collecting",
+      "waypointRelativePos": 0.6511627906976712,
       "endWaypointRelativePos": null,
       "command": null
     }

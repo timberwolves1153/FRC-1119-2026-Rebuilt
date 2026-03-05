@@ -58,13 +58,13 @@ public class VisionIOLimelight implements VisionIO {
 
     // Read new pose observations from NetworkTables
     final PoseEstimate poseEstimate_MegaTag1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-    final PoseEstimate poseEstimate_MegaTag2 =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+    // final PoseEstimate poseEstimate_MegaTag2 =
+    //    LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     if (poseEstimate_MegaTag1 == null
-        || poseEstimate_MegaTag2 == null
-        || poseEstimate_MegaTag1.tagCount == 0
-        || poseEstimate_MegaTag2.tagCount == 0) {
+        // || poseEstimate_MegaTag2 == null
+        || poseEstimate_MegaTag1.tagCount == 0) {
+      // || poseEstimate_MegaTag2.tagCount == 0) {
       return;
     }
 
@@ -74,16 +74,17 @@ public class VisionIOLimelight implements VisionIO {
     poseEstimate_MegaTag1.pose =
         new Pose2d(
             poseEstimate_MegaTag1.pose.getTranslation(), poseEstimate_MegaTag1.pose.getRotation());
-    poseEstimate_MegaTag2.pose =
-        new Pose2d(
-            poseEstimate_MegaTag2.pose.getTranslation(), poseEstimate_MegaTag1.pose.getRotation());
+    // poseEstimate_MegaTag2.pose =
+    //     new Pose2d(
+    //         poseEstimate_MegaTag2.pose.getTranslation(),
+    // poseEstimate_MegaTag1.pose.getRotation());
 
     inputs.poseObservations[0] =
         new Measurement(poseEstimate_MegaTag1.pose, poseEstimate_MegaTag1.timestampSeconds);
-    inputs.poseObservations[1] =
-        new Measurement(poseEstimate_MegaTag2.pose, poseEstimate_MegaTag2.timestampSeconds);
+    // inputs.poseObservations[1] =
+    //    new Measurement(poseEstimate_MegaTag2.pose, poseEstimate_MegaTag2.timestampSeconds);
     // (poseEstimate_MegaTag1.pose, poseEstimate_MegaTag2.pose);
 
-    posePublisher.set(poseEstimate_MegaTag2.pose);
+    posePublisher.set(poseEstimate_MegaTag1.pose);
   }
 }

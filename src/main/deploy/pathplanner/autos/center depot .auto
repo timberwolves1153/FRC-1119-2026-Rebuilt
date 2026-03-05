@@ -11,15 +11,15 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Stop Intake"
+            "waitTime": 0.2
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Bring in Intake"
+            "name": "Stop Collecting"
           }
         },
         {
@@ -31,13 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Start Shooter"
+            "name": "Start Firing"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 10.0
           }
         },
         {
@@ -47,44 +47,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Start Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Indexing"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 6.0
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Indexing"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooter"
+                  "name": "Stop Firing"
                 }
               }
             ]

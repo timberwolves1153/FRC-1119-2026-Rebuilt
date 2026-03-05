@@ -13,32 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Start Shooter"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Indexing"
-                }
-              }
-            ]
+            "name": "Start Firing"
           }
         },
         {
@@ -54,19 +29,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Stop Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Indexing"
+                  "name": "Stop Firing"
                 }
               }
             ]
@@ -93,13 +56,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Start Shooter"
+            "name": "Start Firing"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 5.0
           }
         },
         {
@@ -109,44 +72,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Start Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Indexing"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Indexing"
+                  "name": "Stop Firing"
                 }
               }
             ]
