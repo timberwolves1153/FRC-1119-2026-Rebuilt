@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,6 +29,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private boolean wonAuto = false;
 
   public Robot() {
     // Record metadata
@@ -93,6 +95,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber(
         "Match Info: Shift Time Left?",
         ShiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
+    SmartDashboard.putBoolean("Match Info: Won Auto?", wonAuto);
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
@@ -137,7 +140,18 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    wonAuto =
+        DriverStation.getAlliance()
+            .map(
+                alliance ->
+                    alliance == Alliance.Blue
+                        ? ShiftHelpers.blueWonAuto()
+                        : !ShiftHelpers.blueWonAuto())
+            .orElse(false);
+
+    SmartDashboard.putBoolean("Match Info: Won Auto?", wonAuto);
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

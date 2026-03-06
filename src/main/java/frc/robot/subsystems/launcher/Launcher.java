@@ -10,11 +10,13 @@ public class Launcher extends SubsystemBase {
   public LauncherIO launcherIO;
   public LauncherInputsAutoLogged launcherInputs;
 
+  private double YEET_RPM = 5000;
+
   public Launcher(LauncherIO launcherIO) {
     this.launcherIO = launcherIO;
     this.launcherInputs = new LauncherInputsAutoLogged();
 
-    SmartDashboard.putNumber("LauncherSpeedRPM", 2000);
+    SmartDashboard.putNumber("LauncherSpeedRPM", 3750);
   }
 
   @Override
@@ -45,6 +47,11 @@ public class Launcher extends SubsystemBase {
   }
 
   public Command dashboardSpinUpCommand() {
-    return defer(() -> spinUpCommand(-SmartDashboard.getNumber("LauncherSpeedRPM", 2000)));
+    return defer(() -> spinUpCommand(-SmartDashboard.getNumber("LauncherSpeedRPM", 3750)));
+  }
+
+  public Command yeetCommand() {
+    return runOnce(() -> setLauncherRPM(YEET_RPM))
+        .andThen(Commands.waitUntil(launcherIO::isVelocityInTolerance));
   }
 }

@@ -60,6 +60,6 @@ public class GyroIOPigeon2 implements GyroIO {
   }
 
   public void resetGyro() {
-    pigeon.setYaw(0);
+    pigeon.setYaw(180);
   }
 }

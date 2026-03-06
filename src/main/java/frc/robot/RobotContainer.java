@@ -10,7 +10,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -156,8 +155,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driveController.getLeftY(),
-            () -> driveController.getLeftX(),
+            () -> -driveController.getLeftY(),
+            () -> -driveController.getLeftX(),
             () -> -driveController.getRightX()));
 
     // Lock to hub when A button is held
@@ -166,36 +165,23 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> driveController.getLeftY(),
-                () -> driveController.getLeftX(),
+                () -> -driveController.getLeftY(),
+                () -> -driveController.getLeftX(),
                 drive::calculateAimingAngle));
 
     // Switch to X pattern when X button is pressed
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
-    driveController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
-
+    // Reset gyro to 0° when Start button is pressed
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
-    opController.rightTrigger().onTrue(superstructureCommands.launchManually());
-    opController.rightTrigger().onFalse(superstructureCommands.stop());
-
-    opController.leftTrigger().onTrue(superstructureCommands.launchManually());
-    opController.leftTrigger().onFalse(superstructureCommands.stop());
-
+    opController.leftTrigger().whileTrue(superstructureCommands.launchWhenReady());
+    opController.rightTrigger().whileTrue(superstructureCommands.launchManually());
     opController.rightBumper().onTrue(intake.deployCommand());
     opController.leftBumper().onTrue(intake.retractCommand());
     opController.a().onTrue(intake.intakeCommand());
     opController.b().onTrue(intake.stopIntakeCommand());
+    opController.rightStick().whileTrue(superstructureCommands.yeet());
   }
 
   /**

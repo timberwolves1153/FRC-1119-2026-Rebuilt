@@ -38,6 +38,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -105,6 +107,8 @@ public class Drive extends SubsystemBase {
 
   private Pose2d hubPose = FieldConstants.Hub.redHubCenter;
 
+  private final Field2d smartDashboardField = new Field2d();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -130,7 +134,7 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(15.0, 0.0, 0.0), new PIDConstants(15.0, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -154,6 +158,8 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    SmartDashboard.putData("Field", smartDashboardField);
   }
 
   @Override
@@ -225,6 +231,8 @@ public class Drive extends SubsystemBase {
         0,
         0,
         0);
+
+    smartDashboardField.setRobotPose(getPose());
   }
 
   /**
@@ -381,13 +389,14 @@ public class Drive extends SubsystemBase {
   }
 
   public void setGoalHub(Optional<Alliance> alliance) {
-    alliance
-        .map(
-            a ->
-                a == Alliance.Red
-                    ? FieldConstants.Hub.redHubCenter
-                    : FieldConstants.Hub.blueHubCenter)
-        .orElse(FieldConstants.Hub.redHubCenter); // or "" or "Unknown"
+    hubPose =
+        alliance
+            .map(
+                a ->
+                    a == Alliance.Red
+                        ? FieldConstants.Hub.redHubCenter
+                        : FieldConstants.Hub.blueHubCenter)
+            .orElse(FieldConstants.Hub.redHubCenter); // or "" or "Unknown"
   }
 
   /** Returns the desired Turret Angle. */
