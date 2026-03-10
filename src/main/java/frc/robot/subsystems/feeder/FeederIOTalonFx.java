@@ -24,7 +24,7 @@ public class FeederIOTalonFx implements FeederIO {
 
   public void config() {
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.SupplyCurrentLimit = 40;
+    config.CurrentLimits.SupplyCurrentLimit = 50;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     feederMotor.getConfigurator().apply(config);

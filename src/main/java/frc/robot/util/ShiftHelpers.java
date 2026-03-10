@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ShiftHelpers {
 
@@ -54,6 +55,8 @@ public class ShiftHelpers {
   public static boolean currentShiftIsYours() {
     double currentMatchTime = DriverStation.getMatchTime();
     boolean isBlueShift = isCurrentShiftBlue(currentMatchTime);
-    return isBlueShift;
+    return DriverStation.getAlliance()
+        .map(alliance -> alliance == Alliance.Blue ? isBlueShift : !isBlueShift)
+        .orElse(isBlueShift);
   }
 }

@@ -10,7 +10,7 @@ public class Launcher extends SubsystemBase {
   public LauncherIO launcherIO;
   public LauncherInputsAutoLogged launcherInputs;
 
-  private double YEET_RPM = 5000;
+  private double YEET_RPM = -6000;
 
   public Launcher(LauncherIO launcherIO) {
     this.launcherIO = launcherIO;
@@ -33,6 +33,10 @@ public class Launcher extends SubsystemBase {
     launcherIO.setLauncherRPM(rpm);
   }
 
+  public Command reverseMotor() {
+    return runOnce(() -> setLauncherRPM(2000));
+  }
+
   public void stopLauncher() {
     launcherIO.stopLauncher();
   }
@@ -53,5 +57,9 @@ public class Launcher extends SubsystemBase {
   public Command yeetCommand() {
     return runOnce(() -> setLauncherRPM(YEET_RPM))
         .andThen(Commands.waitUntil(launcherIO::isVelocityInTolerance));
+  }
+
+  public Command stopLaunchCommand() {
+    return runOnce(() -> setLauncherRPM(0));
   }
 }

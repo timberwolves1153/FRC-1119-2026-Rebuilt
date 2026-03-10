@@ -29,6 +29,10 @@ public class Floor extends SubsystemBase {
     Logger.processInputs("floor", floorInputs);
   }
 
+  public Command floorStopCommand() {
+    return runOnce(() -> setFloorVoltage(0));
+  }
+
   public Command floorCommand() {
     return startEnd(
         () -> {

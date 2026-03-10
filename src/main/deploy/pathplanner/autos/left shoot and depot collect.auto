@@ -7,25 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "center to depot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Collecting"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "depot to left shooting pos"
+            "pathName": "left shoot"
           }
         },
         {
@@ -37,20 +19,49 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 10.0
+            "waitTime": 3.0
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Firing"
-                }
-              }
-            ]
+            "name": "Stop Firing"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left shoot to depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Collecting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left depot to collect"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Collecting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left collect to shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Firing"
           }
         }
       ]

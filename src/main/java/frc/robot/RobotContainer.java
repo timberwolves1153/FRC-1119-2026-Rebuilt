@@ -126,9 +126,6 @@ public class RobotContainer {
         break;
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
     // Set up SysId routines
 
     // Configure Superstructure
@@ -138,8 +135,11 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Start Collecting", intake.intakeCommand());
     NamedCommands.registerCommand("Stop Collecting", intake.stopIntakeCommand());
-    NamedCommands.registerCommand("Start Firing", superstructureCommands.launchManually());
+    NamedCommands.registerCommand("Start Firing", superstructureCommands.launchWhenReady());
     NamedCommands.registerCommand("Stop Firing", superstructureCommands.stop());
+
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     vision.setDefaultCommand(updateVisionCommand());
   }
@@ -177,10 +177,14 @@ public class RobotContainer {
 
     opController.leftTrigger().whileTrue(superstructureCommands.launchWhenReady());
     opController.rightTrigger().whileTrue(superstructureCommands.launchManually());
+    opController.rightTrigger().onFalse(superstructureCommands.stop());
     opController.rightBumper().onTrue(intake.deployCommand());
     opController.leftBumper().onTrue(intake.retractCommand());
-    opController.a().onTrue(intake.intakeCommand());
+    opController.a().whileTrue(intake.intakeCommand());
+    opController.a().onFalse(intake.stopIntakeCommand());
     opController.b().onTrue(intake.stopIntakeCommand());
+    opController.x().onTrue(superstructureCommands.reverseCommand());
+    opController.x().onFalse(superstructureCommands.stop());
     opController.rightStick().whileTrue(superstructureCommands.yeet());
   }
 

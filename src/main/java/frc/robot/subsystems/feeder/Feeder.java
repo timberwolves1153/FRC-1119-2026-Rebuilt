@@ -36,4 +36,12 @@ public class Feeder extends SubsystemBase {
         },
         () -> stopFeed());
   }
+
+  public Command reverseFeedCommand() {
+    return runOnce(() -> setFeedVoltage(-6));
+  }
+
+  public Command stopFeedCommand() {
+    return runOnce(() -> setFeedVoltage(0));
+  }
 }

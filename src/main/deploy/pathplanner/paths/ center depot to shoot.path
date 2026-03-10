@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.388,
-        "y": 4.035
+        "x": 2.5367509481668775,
+        "y": 4.006333754740835
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3235213270142188,
-        "y": 5.851149289099527
+        "x": 2.531398104265403,
+        "y": 4.851729857819904
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.7152488151658765,
-        "y": 5.947867298578199
+        "x": 0.5218127962085304,
+        "y": 5.980106635071089
       },
       "prevControl": {
-        "x": 1.9491706161137439,
-        "y": 5.970959715639809
+        "x": 2.391694312796208,
+        "y": 5.926374407582937
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,11 +32,11 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.0,
-      "maxWaypointRelativePos": 0.8172757475083017,
+      "minWaypointRelativePos": 0.8031496062992142,
+      "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 0.5,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 1.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Start Collecting",
-      "waypointRelativePos": 0.7641196013289124,
+      "waypointRelativePos": 0.8436445444319541,
       "endWaypointRelativePos": null,
       "command": null
     }

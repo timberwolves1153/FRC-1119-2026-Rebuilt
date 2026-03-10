@@ -75,9 +75,9 @@ public class IntakeIOTalonFX implements IntakeIO {
             .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(120))
+                    .withStatorCurrentLimit(Amps.of(50))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(70))
+                    .withSupplyCurrentLimit(Amps.of(40))
                     .withSupplyCurrentLimitEnable(true))
             .withFeedback(
                 new FeedbackConfigs()
@@ -101,10 +101,15 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   public void configIntakeMotor() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.SupplyCurrentLimit = 40;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    TalonFXConfiguration config =
+        new TalonFXConfiguration()
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(50))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(40))
+                    .withSupplyCurrentLimitEnable(true));
     intakeMotor.getConfigurator().apply(config);
   }
 

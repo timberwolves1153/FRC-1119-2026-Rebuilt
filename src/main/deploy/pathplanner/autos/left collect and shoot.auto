@@ -1,0 +1,85 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Firing"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Firing"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left over bump"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Collecting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": " left sweep"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": " left sweep to left shooting pos"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Firing"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Firing"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Collecting"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

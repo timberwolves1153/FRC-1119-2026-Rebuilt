@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "center to outpost"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "outpost to right shooting pos"
+            "pathName": "center shoot (simple)"
           }
         },
         {
@@ -31,20 +19,37 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 8.0
+            "waitTime": 5.0
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Firing"
-                }
-              }
-            ]
+            "name": "Stop Firing"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "center to depot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot to center shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Firing"
           }
         }
       ]

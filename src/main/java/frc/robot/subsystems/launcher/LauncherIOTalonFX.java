@@ -57,9 +57,9 @@ public class LauncherIOTalonFX implements LauncherIO {
             .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(120))
+                    .withStatorCurrentLimit(Amps.of(70))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(70))
+                    .withSupplyCurrentLimit(Amps.of(40))
                     .withSupplyCurrentLimitEnable(true))
             .withSlot0(
                 new Slot0Configs()

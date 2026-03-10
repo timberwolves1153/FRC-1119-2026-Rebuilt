@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.feeder.Feeder;
 import frc.robot.subsystems.floor.Floor;
@@ -36,6 +35,10 @@ public final class SuperstructureCommands {
         .handleInterrupt(() -> stop());
   }
 
+  public Command reverseCommand() {
+    return Commands.parallel(launcher.reverseMotor(), feeder.reverseFeedCommand());
+  }
+
   public Command launchManually() {
     return launcher.dashboardSpinUpCommand().andThen(feed()).handleInterrupt(() -> stop());
   }
@@ -56,8 +59,8 @@ public final class SuperstructureCommands {
   public Command stop() {
     return Commands.parallel(
         intake.deployCommand(),
-        new InstantCommand(() -> floor.stopFloor()),
-        new InstantCommand(() -> feeder.stopFeed()),
-        new InstantCommand(() -> launcher.stopLauncher()));
+        floor.floorStopCommand(),
+        feeder.stopFeedCommand(),
+        launcher.stopLaunchCommand());
   }
 }

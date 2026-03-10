@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "right to right shooting pos"
+            "pathName": "center shoot (simple)"
           }
         },
         {
@@ -19,38 +19,43 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 2.0
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Firing"
-                }
-              }
-            ]
+            "name": "Stop Firing"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": " right shooting pos to outpost"
+            "pathName": "center shooting pos over left bump"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 5.0
+            "name": "Start Collecting"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost to right shooting pos"
+            "pathName": "left sweep 2.0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Collecting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "post left sweep to shoot"
           }
         },
         {
@@ -62,20 +67,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 7.0
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Firing"
-                }
-              }
-            ]
+            "name": "Stop Firing"
           }
         }
       ]
