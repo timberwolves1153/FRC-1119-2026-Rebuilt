@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "left shoot"
+            "pathName": "center shoot (simple)"
           }
         },
         {
@@ -51,7 +51,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "left over bump"
+            "pathName": "center shooting pos over right bump"
           }
         },
         {
@@ -67,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "left sweep"
+                  "pathName": "right sweep v2"
                 }
               }
             ]
@@ -76,13 +76,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Start Collecting"
+            "name": "Stop Collecting"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "left sweep to left shooting pos 2"
+            "pathName": "post sweep return (right)"
           }
         },
         {

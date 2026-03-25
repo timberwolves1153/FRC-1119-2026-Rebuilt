@@ -11,21 +11,41 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Start Firing"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Firing"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "race",
           "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Firing"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Firing"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
+                }
+              }
+            ]
           }
         },
         {

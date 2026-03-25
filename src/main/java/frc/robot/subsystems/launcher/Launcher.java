@@ -10,7 +10,7 @@ public class Launcher extends SubsystemBase {
   public LauncherIO launcherIO;
   public LauncherInputsAutoLogged launcherInputs;
 
-  private double YEET_RPM = -6000;
+  private double YEET_RPM = -5000;
 
   public Launcher(LauncherIO launcherIO) {
     this.launcherIO = launcherIO;
@@ -60,6 +60,6 @@ public class Launcher extends SubsystemBase {
   }
 
   public Command stopLaunchCommand() {
-    return runOnce(() -> setLauncherRPM(0));
+    return runOnce(() -> setLauncherVoltage(0));
   }
 }

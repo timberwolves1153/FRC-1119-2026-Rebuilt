@@ -11,21 +11,41 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Start Firing"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Firing"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.0
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "race",
           "data": {
-            "waitTime": 2.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Firing"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Firing"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
           }
         },
         {
@@ -35,21 +55,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Start Collecting"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "right sweep"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Collecting"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Collecting"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "right sweep"
+                }
+              }
+            ]
           }
         },
         {
@@ -62,18 +83,6 @@
           "type": "named",
           "data": {
             "name": "Start Firing"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 7.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Firing"
           }
         }
       ]

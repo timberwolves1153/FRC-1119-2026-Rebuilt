@@ -11,15 +11,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Start Firing"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Firing"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
           }
         },
         {
@@ -35,15 +42,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Start Collecting"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "left depot to collect"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Collecting"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "left depot to collect"
+                }
+              }
+            ]
           }
         },
         {

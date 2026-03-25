@@ -176,6 +176,7 @@ public class RobotContainer {
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
     opController.leftTrigger().whileTrue(superstructureCommands.launchWhenReady());
+    opController.leftTrigger().onFalse(superstructureCommands.stop());
     opController.rightTrigger().whileTrue(superstructureCommands.launchManually());
     opController.rightTrigger().onFalse(superstructureCommands.stop());
     opController.rightBumper().onTrue(intake.deployCommand());
@@ -186,6 +187,10 @@ public class RobotContainer {
     opController.x().onTrue(superstructureCommands.reverseCommand());
     opController.x().onFalse(superstructureCommands.stop());
     opController.rightStick().whileTrue(superstructureCommands.yeet());
+    opController.rightStick().onFalse(superstructureCommands.stop());
+    opController.povUp().whileTrue(intake.agitateCommand());
+    opController.povDown().whileTrue(floor.floorCommand());
+    opController.povRight().onTrue(intake.intakeCommand());
   }
 
   /**

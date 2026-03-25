@@ -11,28 +11,9 @@
           }
         },
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Firing"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Firing"
+            "pathName": "center shooting pos over left bump"
           }
         },
         {
@@ -48,29 +29,16 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "center to depot"
+                  "pathName": "left sweep two"
                 }
               }
             ]
           }
         },
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Collecting"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "depot to center shoot"
-                }
-              }
-            ]
+            "pathName": "post left sweep to shoot"
           }
         },
         {

@@ -35,6 +35,15 @@ public final class SuperstructureCommands {
         .handleInterrupt(() -> stop());
   }
 
+  public Command launchWhenReadyAuto() {
+    PrepareLaunchCommand prepareCommand = new PrepareLaunchCommand(launcher, drive::getPose);
+    SmartDashboard.putBoolean("isReadyToLaunch", prepareCommand.isReadyToLaunch());
+    return Commands.parallel(
+            prepareCommand,
+            Commands.waitUntil(() -> prepareCommand.isReadyToLaunch()).andThen(feed()))
+        .handleInterrupt(() -> stop());
+  }
+
   public Command reverseCommand() {
     return Commands.parallel(launcher.reverseMotor(), feeder.reverseFeedCommand());
   }
@@ -58,9 +67,6 @@ public final class SuperstructureCommands {
 
   public Command stop() {
     return Commands.parallel(
-        intake.deployCommand(),
-        floor.floorStopCommand(),
-        feeder.stopFeedCommand(),
-        launcher.stopLaunchCommand());
+        floor.floorStopCommand(), feeder.stopFeedCommand(), launcher.stopLaunchCommand());
   }
 }
