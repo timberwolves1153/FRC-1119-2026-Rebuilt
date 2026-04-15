@@ -9,6 +9,8 @@ public class Floor extends SubsystemBase {
   public FloorInputsAutoLogged floorInputs;
 
   private final double FLOOR_SPEED = -12; // Kraken pulleys on base
+  private final double FLOOR_REVERSE_SPEED = 12;
+  private final double FLOOR_STOP_SPEED = 0;
 
   public Floor(FloorIO floorIO) {
     this.floorIO = floorIO;
@@ -17,6 +19,10 @@ public class Floor extends SubsystemBase {
 
   public void setFloorVoltage(double volts) {
     floorIO.setFloorVoltage(volts);
+  }
+
+  public Command outTakeFloor() {
+    return runOnce(() -> setFloorVoltage(FLOOR_REVERSE_SPEED));
   }
 
   public void stopFloor() {
@@ -30,7 +36,7 @@ public class Floor extends SubsystemBase {
   }
 
   public Command floorStopCommand() {
-    return runOnce(() -> setFloorVoltage(0));
+    return runOnce(() -> setFloorVoltage(FLOOR_STOP_SPEED));
   }
 
   public Command floorCommand() {

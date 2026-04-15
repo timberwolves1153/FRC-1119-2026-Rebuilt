@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
     HOMED(8),
     STOWED(28.5),
     AGITATE(110),
-    DEPLOYED(134);
+    DEPLOYED(130);
 
     private final double degrees;
 
@@ -29,6 +29,7 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public static final double INTAKE_REVERSE_SPEED = 11;
   public static final double INTAKE_SPEED = -11;
   public static final double STOP_SPEED = 0;
 
@@ -66,6 +67,10 @@ public class Intake extends SubsystemBase {
 
   public void setIsHomed(boolean isHomed) {
     intakeInputs.isHomed = isHomed;
+  }
+
+  public Command reverseIntakeCommand() {
+    return runOnce(() -> setIntakeVoltage(INTAKE_REVERSE_SPEED));
   }
 
   public Command intakeCommand() {

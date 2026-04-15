@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.Intake.Position;
 
-public class IntakeIOTalonFX implements IntakeIO {
+public class IntakeIOVortex implements IntakeIO {
   private TalonFX deployMotor = new TalonFX(41);
   private TalonFX intakeMotor = new TalonFX(42);
 
@@ -50,7 +50,7 @@ public class IntakeIOTalonFX implements IntakeIO {
   private static final double DEPLOY_STALL_CURRENT_AMPS = .89;
   private static final Angle DEPLOY_POSITION_TOLERANCE = Degrees.of(5);
 
-  public IntakeIOTalonFX() {
+  public IntakeIOVortex() {
     configIntakeMotor();
     configureDeployMotor();
 
@@ -77,7 +77,7 @@ public class IntakeIOTalonFX implements IntakeIO {
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(50))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(30))
+                    .withSupplyCurrentLimit(Amps.of(40))
                     .withSupplyCurrentLimitEnable(true))
             .withFeedback(
                 new FeedbackConfigs()
@@ -106,7 +106,7 @@ public class IntakeIOTalonFX implements IntakeIO {
             .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(100))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(Amps.of(40))
                     .withSupplyCurrentLimitEnable(true));

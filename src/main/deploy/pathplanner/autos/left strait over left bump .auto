@@ -7,13 +7,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "left shoot"
+            "pathName": " left strait over bump"
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "left over bump"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Collecting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
           }
         },
         {
@@ -36,9 +49,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "left sweep to left shooting pos 2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Collecting"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "left sweep to left shooting pos 2"
+                }
+              }
+            ]
           }
         },
         {

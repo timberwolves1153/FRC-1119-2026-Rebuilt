@@ -38,8 +38,8 @@ import frc.robot.subsystems.floor.FloorIOVortex;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.Position;
 import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIODuelTalonFX;
 import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.launcher.Launcher;
 import frc.robot.subsystems.launcher.LauncherIO;
 import frc.robot.subsystems.launcher.LauncherIOTalonFX;
@@ -85,7 +85,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        intake = new Intake(new IntakeIOTalonFX());
+        intake = new Intake(new IntakeIODuelTalonFX());
         floor = new Floor(new FloorIOVortex());
         feeder = new Feeder(new FeederIOTalonFx());
         launcher = new Launcher(new LauncherIOTalonFX());
@@ -175,22 +175,49 @@ public class RobotContainer {
     // Reset gyro to 0° when Start button is pressed
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
+    // operator controls
+
+    // launch with interpelation table
     opController.leftTrigger().whileTrue(superstructureCommands.launchWhenReady());
     opController.leftTrigger().onFalse(superstructureCommands.stop());
+    // regular launch
     opController.rightTrigger().whileTrue(superstructureCommands.launchManually());
     opController.rightTrigger().onFalse(superstructureCommands.stop());
-    opController.rightBumper().onTrue(intake.deployCommand());
-    opController.leftBumper().onTrue(intake.retractCommand());
-    opController.a().whileTrue(intake.intakeCommand());
-    opController.a().onFalse(intake.stopIntakeCommand());
-    opController.b().onTrue(intake.stopIntakeCommand());
-    opController.x().onTrue(superstructureCommands.reverseCommand());
-    opController.x().onFalse(superstructureCommands.stop());
+    // yeet launch
     opController.rightStick().whileTrue(superstructureCommands.yeet());
     opController.rightStick().onFalse(superstructureCommands.stop());
+    // intake deploy
+    opController.rightBumper().onTrue(intake.deployCommand());
+    opController.leftBumper().onTrue(intake.retractCommand());
+    // intake fuel
+    opController.a().onTrue(intake.intakeCommand());
+    opController.a().onFalse(intake.stopIntakeCommand());
+    // opController.b().onTrue(intake.stopIntakeCommand());
+    // unclog superstructure
+    opController.x().onTrue(superstructureCommands.reverseCommand());
+    opController.x().onFalse(superstructureCommands.stop());
+    // manual agitate
     opController.povUp().whileTrue(intake.agitateCommand());
+    // manual floor
     opController.povDown().whileTrue(floor.floorCommand());
-    opController.povRight().onTrue(intake.intakeCommand());
+    // opController.povRight().onTrue(intake.intakeCommand());
+    // outake onto floor
+    opController.y().onTrue(intake.reverseIntakeCommand()); 
+    opController.y().onTrue(floor.outTakeFloor());
+    opController.y().onFalse(intake.stopIntakeCommand());
+    opController.y().onFalse(floor.floorStopCommand());
+
+    // drive "operator" controls
+
+    // drive controller tests
+    driveController.leftTrigger().whileTrue(intake.intakeCommand());
+    driveController.leftTrigger().onFalse(intake.stopIntakeCommand());
+    driveController.rightTrigger().whileTrue(superstructureCommands.launchWhenReady());
+    driveController.rightTrigger().onFalse(superstructureCommands.stop());
+    driveController.leftBumper().onTrue(intake.reverseIntakeCommand());
+    driveController.leftBumper().onTrue(floor.outTakeFloor());
+    driveController.leftBumper().onFalse(intake.stopIntakeCommand());
+    driveController.leftBumper().onFalse(floor.floorStopCommand());
   }
 
   /**

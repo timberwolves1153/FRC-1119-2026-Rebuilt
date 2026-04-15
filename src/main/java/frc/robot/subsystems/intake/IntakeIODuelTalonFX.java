@@ -14,9 +14,11 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -28,19 +30,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.Intake.Position;
 
-public class IntakeIOTalonFX implements IntakeIO {
+public class IntakeIODuelTalonFX implements IntakeIO {
   private TalonFX deployMotor = new TalonFX(41);
-  private TalonFX intakeMotor = new TalonFX(42);
+  private TalonFX intakeLeaderMotor = new TalonFX(45);
+  private TalonFX intakeFollowerMotor = new TalonFX(46);
 
   private final StatusSignal<Current> deployCurrentValue = deployMotor.getSupplyCurrent();
   private final StatusSignal<Voltage> deployAppliedVolts = deployMotor.getMotorVoltage();
   private final StatusSignal<Angle> deployPosition = deployMotor.getPosition();
   private final StatusSignal<Temperature> deployTemp = deployMotor.getDeviceTemp();
-
-  private final StatusSignal<Current> intakeCurrentValue = intakeMotor.getSupplyCurrent();
-  private final StatusSignal<Voltage> intakeAppliedVolts = intakeMotor.getMotorVoltage();
-  private final StatusSignal<Angle> intakePosition = intakeMotor.getPosition();
-  private final StatusSignal<Temperature> intakeTemp = intakeMotor.getDeviceTemp();
+  private final StatusSignal<Current> intakeCurrentValue = intakeLeaderMotor.getSupplyCurrent();
+  private final StatusSignal<Voltage> intakeAppliedVolts = intakeLeaderMotor.getMotorVoltage();
+  private final StatusSignal<Angle> intakePosition = intakeLeaderMotor.getPosition();
+  private final StatusSignal<Temperature> intakeTemp = intakeLeaderMotor.getDeviceTemp();
 
   private static final double deployMotorReduction = 18.67;
   private static final AngularVelocity maxDeploySpeed =
@@ -50,9 +52,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private static final double DEPLOY_STALL_CURRENT_AMPS = .89;
   private static final Angle DEPLOY_POSITION_TOLERANCE = Degrees.of(5);
 
-  public IntakeIOTalonFX() {
-    configIntakeMotor();
+  public IntakeIODuelTalonFX() {
     configureDeployMotor();
+    intakeLeaderMotor.getConfigurator();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50,
@@ -60,13 +62,29 @@ public class IntakeIOTalonFX implements IntakeIO {
         deployAppliedVolts,
         deployPosition,
         deployTemp,
+        deployCurrentValue,
         intakeCurrentValue,
         intakeAppliedVolts,
         intakePosition,
         intakeTemp);
-
-    intakeMotor.optimizeBusUtilization();
     deployMotor.optimizeBusUtilization();
+  }
+
+  private void configureIntakeMotors() {
+    final TalonFXConfiguration intakeConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(50))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(40))
+                    .withSupplyCurrentLimitEnable(true));
+
+    intakeLeaderMotor.getConfigurator().apply(intakeConfig);
+    intakeFollowerMotor.getConfigurator().apply(intakeConfig);
+    intakeFollowerMotor.setControl(
+        new Follower(intakeLeaderMotor.getDeviceID(), MotorAlignmentValue.Opposed));
   }
 
   private void configureDeployMotor() {
@@ -100,19 +118,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     deployMotor.getConfigurator().apply(deployConfig);
   }
 
-  public void configIntakeMotor() {
-    TalonFXConfiguration config =
-        new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
-                    .withSupplyCurrentLimitEnable(true));
-    intakeMotor.getConfigurator().apply(config);
-  }
-
   @Override
   public void setDeployVoltage(double volts) {
     deployMotor.setVoltage(volts);
@@ -120,7 +125,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void setIntakeVoltage(double volts) {
-    intakeMotor.setVoltage(volts);
+    intakeLeaderMotor.setVoltage(volts);
   }
 
   private boolean isPositionWithinTolerance(Angle targetPosition) {
@@ -133,8 +138,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   public void updateInputs(IntakeInputs inputs) {
     inputs.deployAppliedVolts = deployMotor.getMotorVoltage().getValue().in(Volts);
     inputs.deployCurrentValue = deployMotor.getSupplyCurrent().getValue().in(Amps);
-
-    inputs.intakeAppliedVolts = intakeAppliedVolts.getValue().in(Volts);
 
     inputs.intakeDeployDegrees =
         Units.rotationsToDegrees(deployMotor.getPosition().getValueAsDouble());
