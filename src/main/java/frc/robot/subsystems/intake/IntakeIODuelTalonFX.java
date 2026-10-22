@@ -54,7 +54,7 @@ public class IntakeIODuelTalonFX implements IntakeIO {
 
   public IntakeIODuelTalonFX() {
     configureDeployMotor();
-    intakeLeaderMotor.getConfigurator();
+    configureIntakeMotors();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50,

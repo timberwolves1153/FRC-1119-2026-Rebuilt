@@ -64,6 +64,7 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
   private final CommandXboxController opController = new CommandXboxController(1);
+  private final CommandXboxController demoController = new CommandXboxController(2);
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -155,13 +156,13 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -driveController.getLeftY(),
-            () -> -driveController.getLeftX(),
-            () -> -driveController.getRightX()));
+            () -> -1.0 * driveController.getLeftY(),
+            () -> -1.00 * driveController.getLeftX(),
+            () -> -1.00 * driveController.getRightX()));
 
     // Lock to hub when A button is held
     driveController
-        .a()
+        .rightTrigger()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -174,6 +175,7 @@ public class RobotContainer {
 
     // Reset gyro to 0° when Start button is pressed
     driveController.start().onTrue(new InstantCommand(() -> drive.resetGyro()));
+    demoController.a().onTrue(new InstantCommand(() -> drive.resetGyro()));
 
     // operator controls
 
@@ -187,7 +189,6 @@ public class RobotContainer {
     opController.rightStick().whileTrue(superstructureCommands.yeet());
     opController.rightStick().onFalse(superstructureCommands.stop());
     // intake deploy
-    opController.rightBumper().onTrue(intake.deployCommand());
     opController.leftBumper().onTrue(intake.retractCommand());
     // intake fuel
     opController.a().onTrue(intake.intakeCommand());
@@ -202,7 +203,7 @@ public class RobotContainer {
     opController.povDown().whileTrue(floor.floorCommand());
     // opController.povRight().onTrue(intake.intakeCommand());
     // outake onto floor
-    opController.y().onTrue(intake.reverseIntakeCommand()); 
+    opController.y().onTrue(intake.reverseIntakeCommand());
     opController.y().onTrue(floor.outTakeFloor());
     opController.y().onFalse(intake.stopIntakeCommand());
     opController.y().onFalse(floor.floorStopCommand());
@@ -212,8 +213,6 @@ public class RobotContainer {
     // drive controller tests
     driveController.leftTrigger().whileTrue(intake.intakeCommand());
     driveController.leftTrigger().onFalse(intake.stopIntakeCommand());
-    driveController.rightTrigger().whileTrue(superstructureCommands.launchWhenReady());
-    driveController.rightTrigger().onFalse(superstructureCommands.stop());
     driveController.leftBumper().onTrue(intake.reverseIntakeCommand());
     driveController.leftBumper().onTrue(floor.outTakeFloor());
     driveController.leftBumper().onFalse(intake.stopIntakeCommand());
